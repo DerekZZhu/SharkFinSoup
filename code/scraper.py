@@ -9,4 +9,8 @@ def get_ohlcv(tickers=['AMZN', 'META', 'GOOG', 'AAPL', 'MSFT', 'NFLX'], start=(d
         ticker_data.fillna(method='bfill', axis=0, inplace=True)
         ohlcv_data[ticker] = ticker_data
 
+    return ohlcv_data
 
+
+def get_single(ticker, start=(dt.datetime.today() - dt.timedelta(365)), end=(dt.datetime.today())):
+    return yf.download(ticker, start, end)
