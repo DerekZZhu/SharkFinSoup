@@ -45,5 +45,19 @@ def BB(dataset, n=20):
 
     return df[['Middle Band', 'Upper Band', 'Lower Band']]
 
+
+def RSI(dataset, n=14):
+    df = dataset.copy()
+    change = df['Adj Close'] - df['Adj Close'].shift(1)
+    df['Gain'] = np.where(change >= 0, change, 0.0)
+    df['Loss'] = np.where(change < 0, -1*change, 0.0)
+
+    avg_gain = df['Gain'].ewm(alpha=1/n, min_periods=n).mean()
+    avg_loss = df['Loss'].ewm(alpha=1/n, min_periods=n).mean()
+    rs = avg_gain/avg_loss
+    df['RSI'] = 100 - (100/(1+rs))
+
+    return df
+
 df = get_single('AMZN')
-print(BB(df).tail())
+print(RSI(df).tail(10))
