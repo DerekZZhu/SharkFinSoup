@@ -59,5 +59,17 @@ def RSI(dataset, n=14):
 
     return df
 
+
+def ADX(dataset, n=20):
+    df = dataset.copy()
+    df['ATR'] = ATR(dataset, n)
+    up_move = df['High'] - df['High'].shift(1)
+    down_move = df['Low'].shift(1) - df['Low']
+    pos_DI = 100*(np.where((up_move>down_move) & (up_move > 0), up_move, 0)/df['ATR']).ewm(com=n, min_periods=n).mean()
+    neg_DI = 100*(np.where((down_move> up_move) & (down_move> 0), down_move, 0)/df['ATR']).ewm(com=n, min_periods=n).mean()
+
+    df['ADX'] = 100 * abs((pos_DI - neg_DI)/(pos_DI + neg_DI)).ewm(com=n, min_periods=n).mean()
+    return df
+
 df = get_single('AMZN')
-print(RSI(df).tail(10))
+print(ADX(df).tail(10))
