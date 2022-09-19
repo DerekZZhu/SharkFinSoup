@@ -1,4 +1,4 @@
-import pandas as pd
+from stocktrends import Renko
 import numpy as np
 from scraper import get_single
 
@@ -70,6 +70,16 @@ def ADX(dataset, n=20):
 
     df['ADX'] = 100 * abs((pos_DI - neg_DI)/(pos_DI + neg_DI)).ewm(com=n, min_periods=n).mean()
     return df
+
+
+def RENKO(dataset, hourly_data):
+    df = dataset.copy.drop('Close', axis=1, inplace=True).reset_index(inplace=True)
+    df.columns = ["date", "open", "high", "low", "close"]
+
+    renko_model = Renko(df)
+    renko_model.brick_size = 3*round(ATR(hourly_data, 120).iloc[-1],0)
+    return renko_model.get_ohlc_data()
+
 
 df = get_single('AMZN')
 print(ADX(df).tail(10))
